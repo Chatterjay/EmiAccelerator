@@ -37,20 +37,3 @@
 | `/emiacc reload`              | 触发 EMI 重载                 |
 | `/emiacc reload --force`      | 清除缓存并强制全量重载        |
 
-## 构建
-
-```bash
-./gradlew build
-# 产物: build/libs/emi_accelerator-<版本号>.jar
-```
-
-## 发布
-
-推送版本标签以触发 GitHub Actions 自动构建：
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-工作流会自动构建 jar 并发布到 GitHub Releases。
