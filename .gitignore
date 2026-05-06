@@ -111,8 +111,9 @@ gradle-app.setting
 
 **/build/
 
-# Claude Code memory and conversation data
+# Claude Code memory, conversation data, and project instructions
 .claude/
+CLAUDE.md
 
 # Common working directory
 run/
