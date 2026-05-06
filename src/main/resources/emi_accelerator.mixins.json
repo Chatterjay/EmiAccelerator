@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.chatterjay.emi_accelerator.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "EmiStackListMixin",
+    "EmiReloadManagerMixin",
+    "EmiReloadWorkerMixin",
+    "EmiScreenManagerMixin",
+    "EmiSearchMixin",
+    "EmiReloadLogMixin",
+    "EmiPlayerInventoryMixin",
+    "EmiSearchBakeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

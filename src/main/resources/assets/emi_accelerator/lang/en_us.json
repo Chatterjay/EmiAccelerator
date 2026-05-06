@@ -1,0 +1,5 @@
+{
+  "emi_accelerator.command.status": "Show EMI Accelerator cache status",
+  "emi_accelerator.command.clear": "Clear EMI Accelerator cache",
+  "emi_accelerator.command.reload": "Trigger EMI reload"
+}
