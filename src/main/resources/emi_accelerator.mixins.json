@@ -11,7 +11,8 @@
     "EmiSearchMixin",
     "EmiReloadLogMixin",
     "EmiPlayerInventoryMixin",
-    "EmiSearchBakeMixin"
+    "EmiSearchBakeMixin",
+    "EmiReloadManagerDebounceMixin"
   ],
   "injectors": {
     "defaultRequire": 1
