@@ -8,6 +8,19 @@ plugins {
 version = mod_version
 group = mod_group_id
 
+// CI version override from env var or git tag (e.g. v1.0.1 → 1.0.1)
+def envVersion = System.getenv("CI_VERSION")
+if (envVersion == null) {
+    def ref = System.getenv("GITHUB_REF_NAME")
+    if (ref != null && (ref.startsWith("v") || ref.startsWith("V"))) {
+        envVersion = ref.substring(1)
+    }
+}
+if (envVersion != null) {
+    project.ext.mod_version = envVersion
+    version = envVersion
+}
+
 repositories {
     mavenLocal()
     maven {

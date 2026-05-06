@@ -1,0 +1,9 @@
+# Normalize line endings for all text files
+* text=auto
+
+# Gradle wrapper jars are binary
+*.jar binary
+
+# Explicitly set line endings for shell scripts
+*.bat text eol=crlf
+gradlew text eol=lf
