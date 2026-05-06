@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "org.chatterjay.emi_accelerator.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
+  "client": [
     "EmiStackListMixin",
     "EmiReloadManagerMixin",
     "EmiReloadWorkerMixin",
