@@ -1,74 +1,22 @@
 package org.chatterjay.emi_accelerator.mixin;
 
-import dev.emi.emi.runtime.EmiReloadManager;
-import dev.emi.emi.screen.EmiScreenManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import org.chatterjay.emi_accelerator.config.ModConfig;
 import org.chatterjay.emi_accelerator.util.EmiSearchDeferrer;
 import org.chatterjay.emi_accelerator.util.EmiStackCache;
 import org.chatterjay.emi_accelerator.util.ReloadTimer;
-import org.slf4j.Logger;
-import com.mojang.logging.LogUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.lang.reflect.Field;
-
 @Mixin(targets = "dev.emi.emi.runtime.EmiReloadManager$ReloadWorker", remap = false)
 public class EmiReloadWorkerMixin {
-    private static final Logger LOGGER = LogUtils.getLogger();
 
-    @Inject(method = "run", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "run", at = @At("HEAD"))
     private void onRunHead(CallbackInfo ci) {
         ReloadTimer.startReload();
-
-        if (!ModConfig.cacheEnabled) return;
-
-        if (EmiStackCache.tryLoad()) {
-            try {
-                Field statusField = EmiReloadManager.class.getDeclaredField("status");
-                statusField.setAccessible(true);
-                statusField.setInt(null, 2);
-
-                Field threadField = EmiReloadManager.class.getDeclaredField("thread");
-                threadField.setAccessible(true);
-                threadField.set(null, null);
-
-                Field restartField = EmiReloadManager.class.getDeclaredField("restart");
-                restartField.setAccessible(true);
-                restartField.setBoolean(null, false);
-            } catch (Exception e) {
-                LOGGER.error("Failed to finalize reload state", e);
-            }
-
-            ReloadTimer.finishReload(true);
-            long totalTime = ReloadTimer.getLastReloadDuration();
-
-            Minecraft.getInstance().execute(() -> {
-                try {
-                    EmiScreenManager.forceRecalculate();
-                } catch (Exception ignored) {
-                }
-                try {
-                    EmiScreenManager.search.update();
-                } catch (Exception ignored) {
-                }
-
-                var player = Minecraft.getInstance().player;
-                if (player != null && EmiStackCache.cacheFileExists()) {
-                    player.displayClientMessage(
-                            Component.literal("§a[EMI加速] §7重载完成 §a(缓存加速: " + totalTime + "ms)"),
-                            false);
-                }
-            });
-
-            LOGGER.debug("EMI reload fully skipped via cache ({}ms)", totalTime);
-            ci.cancel();
-            return;
-        }
     }
 
     // ─── Checkpoints for every major method call in run() ───
