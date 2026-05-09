@@ -1,39 +1,63 @@
 # EMI Accelerator
 
-将 EMI 的堆栈列表缓存到磁盘，并将搜索索引构建延迟到后台线程，将 EMI 重载时间从约 40 秒缩短至约 14 秒。
+将 EMI 物品堆栈列表缓存到磁盘，并将搜索索引构建延迟到后台线程，大幅缩短 EMI 重载时间。
 
-## 基本信息
+## 概述
 
-| 字段       | 值                                              |
-|------------|-------------------------------------------------|
-| **版本**   | 1.0.0                                           |
-| **Minecraft** | 1.21.1                                        |
-| **加载器** | NeoForge 21.1.228 (`[21,)`)                     |
-| **运行侧** | 客户端专用（无需安装至服务端）                   |
-| **协议**   | GNU LGPL 3.0                                    |
-| **作者**   | Chatterjay                                      |
+EMI 在每次进入世界或资源重载时，都会重建完整的物品堆栈列表和搜索索引。对于大量模组的整合包，这个过程可能耗费数十秒，且搜索索引构建期间游戏界面完全卡死。
 
-## 依赖项
+EMI Accelerator 通过以下方式解决此问题：
 
-| 模组 | 版本     | 必需 |
-|------|----------|------|
-| [EMI](https://modrinth.com/mod/emi) | 1.1.22+  | 是   |
+- **堆栈缓存**：首次加载时将 `EmiStackList.stacks` 序列化为 JSON 缓存到磁盘。后续进入游戏跳过全量重载（约 130ms 对比约 40s）。
+- **延迟搜索**：将 `EmiSearch.bake()` 推迟到后台线程执行，消除约 10s 的界面阻塞。
+- **自动刷新**：后台搜索完成后自动更新 EMI 搜索结果，无需手动重新输入。
 
-## 功能
 
-- **堆栈缓存**：首次重载时将 `EmiStackList.stacks` 序列化为 JSON，后续进入游戏跳过全量重载（约 130ms 对比约 40s）
-- **延迟搜索**：`EmiSearch.bake()` 在后台线程运行，消除约 10s 的界面阻塞。搜索在约 7s 后自动可用，界面不卡死
-- **自动刷新**：后台搜索完成后自动更新 EMI 搜索结果，无需手动重新输入
-- **缓存失效**：模组列表变化时（SHA-256 哈希校验）自动清除缓存
-- **诊断**：重载各阶段耗时记录至 `config/emi-accelerator/reload-timings.json`
-- **配置**：`config/emi-accelerator/emi-accelerator.properties`
+## 用法
 
-## 指令
+| 指令 | 说明 |
+|------|------|
+| `/emiacc status` | 查看缓存状态、大小、命中次数 |
+| `/emiacc clear` | 删除缓存（下次加载时重建） |
+| `/emiacc reload` | 触发 EMI 重载 |
+| `/emiacc reload --force` | 清除缓存并强制全量重载 |
 
-| 指令                          | 说明                          |
-|-------------------------------|-------------------------------|
-| `/emiacc status`              | 查看缓存状态、大小、命中情况  |
-| `/emiacc clear`               | 删除缓存（下次加载时重建）    |
-| `/emiacc reload`              | 触发 EMI 重载                 |
-| `/emiacc reload --force`      | 清除缓存并强制全量重载        |
+## 配置
 
+配置文件位于 `config/emi-accelerator/emi-accelerator.properties`：
+
+| 选项 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `cacheEnabled` | boolean | `true` | 是否启用堆栈缓存 |
+| `autoClearOnModChange` | boolean | `true` | 模组列表变化时自动清除缓存 |
+| `maxFileSizeMb` | int | `100` | 缓存文件大小上限（MB） |
+| `diagnosticsEnabled` | boolean | `false` | 是否记录各阶段耗时到 `reload-timings.json` |
+| `deferredSearchEnabled` | boolean | `true` | 是否启用延迟搜索 |
+
+## 工作原理
+
+1. EMI 标签同步触发 → `EmiReloadManager.reload()` → `ReloadWorker.run()` 启动
+2. 检查缓存是否存在且有效（SHA-256 模组列表哈希校验）
+3. 缓存命中 → 直接反序列化堆栈列表 → 跳过全量重载 → 搜索后台构建 → 完成
+4. 缓存未命中 → 正常 EMI 重载 → 完成后异步写入缓存
+5. 搜索构建完成后自动刷新 EMI 界面，显示「[EMI加速] 搜索已就绪」
+
+## 依赖
+
+| 模组 | 版本 | 必需 |
+|------|------|------|
+| [EMI](https://modrinth.com/mod/emi) | 1.1.22+ | 是 |
+
+- 加载器：NeoForge 21.1.228+
+- 运行侧：客户端专用
+- 环境：Minecraft 1.21.1
+
+## 构建
+
+```bash
+./gradlew build
+```
+
+## 协议
+
+[GNU AGPL 3.0](LICENSE)
