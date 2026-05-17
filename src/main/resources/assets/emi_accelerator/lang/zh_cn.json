@@ -1,0 +1,33 @@
+{
+  "emi_accelerator.command.status": "显示EMI加速器缓存状态",
+  "emi_accelerator.command.clear": "清除EMI加速器缓存",
+  "emi_accelerator.command.reload": "触发EMI重载",
+
+  "emi_accelerator.status.title": "§a[EMI加速] §7状态:",
+  "emi_accelerator.status.accel": "  §7加速功能: ",
+  "emi_accelerator.status.file_size": "  §7文件大小: §f%s",
+  "emi_accelerator.status.none": "无",
+  "emi_accelerator.status.cache_hit_prefix": "  §7缓存命中: ",
+  "emi_accelerator.status.yes": "§a是",
+  "emi_accelerator.status.no": "§c否",
+  "emi_accelerator.status.load_time": "  §7加载耗时: §f%dms",
+  "emi_accelerator.status.deferred_prefix": "  §7延迟搜索: ",
+  "emi_accelerator.status.on": "§a开",
+  "emi_accelerator.status.off": "§c关",
+  "emi_accelerator.status.building": " §e(构建中…)",
+
+  "emi_accelerator.cache.cleared": "§a[EMI加速] §7缓存已清除，下次重载将重新生成",
+  "emi_accelerator.cache.cleared_reload": "§a[EMI加速] §7缓存已清除",
+
+  "emi_accelerator.reload.triggered": "§a[EMI加速] §7正在重载...",
+  "emi_accelerator.reload.complete_cached": "§a[EMI加速] §7重载完成 §a(缓存加速: %dms)",
+  "emi_accelerator.reload.complete_uncached": "§a[EMI加速] §7重载完成 §e(未缓存, %dms)",
+  "emi_accelerator.reload.building_suffix": " §7(搜索后台构建…)",
+  "emi_accelerator.reload.full_force": "§a[EMI加速] §7正在进行全量重载(延迟搜索)...",
+
+  "emi_accelerator.search.ready": "§a[EMI加速] §7搜索已就绪",
+
+  "emi_accelerator.toggle.chat": "§a[EMI加速] §7聊天消息: %s",
+  "emi_accelerator.toggle.debug": "§a[EMI加速] §7调试模式: %s",
+  "emi_accelerator.toggle.accel": "§a[EMI加速] §7加速功能: %s"
+}

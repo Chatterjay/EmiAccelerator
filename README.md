@@ -17,22 +17,28 @@ EMI Accelerator 通过以下方式解决此问题：
 
 | 指令 | 说明 |
 |------|------|
-| `/emiacc status` | 查看缓存状态、大小、命中次数 |
+| `/emiacc status` | 查看缓存状态、配置状态 |
+| `/emiacc enable [true\|false]` | 启用/禁用加速功能 |
+| `/emiacc chat [true\|false]` | 显示/隐藏聊天提示信息 |
+| `/emiacc debug [true\|false]` | 启用/禁用调试日志 |
 | `/emiacc clear` | 删除缓存（下次加载时重建） |
 | `/emiacc reload` | 触发 EMI 重载 |
 | `/emiacc reload --force` | 清除缓存并强制全量重载 |
 
 ## 配置
 
-配置文件位于 `config/emi-accelerator/emi-accelerator.properties`：
+配置文件位于 `config/emi-accelerator/emi-accelerator.txt`：
 
 | 选项 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `cacheEnabled` | boolean | `true` | 是否启用堆栈缓存 |
-| `autoClearOnModChange` | boolean | `true` | 模组列表变化时自动清除缓存 |
-| `maxFileSizeMb` | int | `100` | 缓存文件大小上限（MB） |
-| `diagnosticsEnabled` | boolean | `false` | 是否记录各阶段耗时到 `reload-timings.json` |
-| `deferredSearchEnabled` | boolean | `true` | 是否启用延迟搜索 |
+| `acceleration.enabled` | boolean | `true` | 是否启用加速功能 |
+| `cache.enabled` | boolean | `true` | 是否启用堆栈缓存 |
+| `cache.auto_clear_on_mod_change` | boolean | `true` | 模组列表变化时自动清除缓存 |
+| `cache.max_file_size_mb` | int | `50` | 缓存文件大小上限（MB） |
+| `diagnostics.enabled` | boolean | `true` | 是否记录各阶段耗时到 `reload-timings.json` |
+| `search.deferred` | boolean | `true` | 是否启用延迟搜索 |
+| `chat.hide_messages` | boolean | `false` | 是否隐藏聊天提示信息 |
+| `debug.enabled` | boolean | `false` | 是否启用调试日志 |
 
 ## 工作原理
 

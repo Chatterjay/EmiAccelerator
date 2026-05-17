@@ -37,7 +37,7 @@ public class EmiStackCache {
     }
 
     public static boolean tryLoad() {
-        if (!ModConfig.cacheEnabled) return false;
+        if (!ModConfig.isCacheEnabled()) return false;
 
         cacheUsed = false;
         lastLoadTime = 0;
@@ -46,7 +46,7 @@ public class EmiStackCache {
         if (!Files.exists(cacheFile)) return false;
 
         try {
-            if (Files.size(cacheFile) > (long) ModConfig.maxFileSizeMb * 1024 * 1024) {
+            if (Files.size(cacheFile) > (long) ModConfig.getMaxFileSizeMb() * 1024 * 1024) {
                 LOGGER.warn("Cache file exceeds size limit, deleting");
                 Files.deleteIfExists(cacheFile);
                 return false;
@@ -72,7 +72,7 @@ public class EmiStackCache {
 
             String modHash = root.get("mod_hash").getAsString();
             if (!modHash.equals(computeModHash())) {
-                if (ModConfig.autoClearOnModChange) {
+                if (ModConfig.isAutoClearOnModChange()) {
                     Files.deleteIfExists(cacheFile);
                 }
                 return false;
@@ -128,7 +128,7 @@ public class EmiStackCache {
     }
 
     public static void saveAsync() {
-        if (!ModConfig.cacheEnabled) return;
+        if (!ModConfig.isCacheEnabled()) return;
         if (cacheUsed) return;
 
         CompletableFuture.runAsync(() -> {

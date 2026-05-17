@@ -24,7 +24,8 @@ public class EmiSearchBakeMixin {
 
     @Inject(method = "bake", at = @At("HEAD"), cancellable = true)
     private static void onBake(CallbackInfo ci) {
-        if (ModConfig.deferredSearchEnabled && EmiSearchDeferrer.consumePending()) {
+        if (!ModConfig.isAccelerationEnabled()) return;
+        if (ModConfig.isDeferredSearchEnabled() && EmiSearchDeferrer.consumePending()) {
             names = new SuffixArray();
             tooltips = new SuffixArray();
             mods = new SuffixArray();

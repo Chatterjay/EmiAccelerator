@@ -33,7 +33,7 @@ public class ReloadTimer {
     private static final List<Checkpoint> checkpoints = new ArrayList<>();
 
     public static void startReload() {
-        if (!ModConfig.diagnosticsEnabled) return;
+        if (!ModConfig.isDiagnosticsEnabled()) return;
         reloadStartTime = System.currentTimeMillis();
         stepStartTime = reloadStartTime;
         currentSteps.clear();
@@ -44,19 +44,19 @@ public class ReloadTimer {
     }
 
     public static void checkpoint(String name) {
-        if (!ModConfig.diagnosticsEnabled || reloadStartTime == 0) return;
+        if (!ModConfig.isDiagnosticsEnabled() || reloadStartTime == 0) return;
         checkpoints.add(new Checkpoint(name, System.currentTimeMillis()));
     }
 
     public static void onStep(String name) {
-        if (!ModConfig.diagnosticsEnabled || reloadStartTime == 0) return;
+        if (!ModConfig.isDiagnosticsEnabled() || reloadStartTime == 0) return;
         long now = System.currentTimeMillis();
         currentSteps.add(new StepRecord(name, now - stepStartTime));
         stepStartTime = now;
     }
 
     public static void finishReload(boolean cacheHit) {
-        if (!ModConfig.diagnosticsEnabled || reloadStartTime == 0) return;
+        if (!ModConfig.isDiagnosticsEnabled() || reloadStartTime == 0) return;
         lastReloadDuration = System.currentTimeMillis() - reloadStartTime;
 
         long now = System.currentTimeMillis();
@@ -87,13 +87,13 @@ public class ReloadTimer {
 
     // Phase profiling: enter/exit a sub-section within the current step
     public static void enterPhase(String name) {
-        if (!ModConfig.diagnosticsEnabled || reloadStartTime == 0) return;
+        if (!ModConfig.isDiagnosticsEnabled() || reloadStartTime == 0) return;
         phaseStack.push(name);
         phaseStartStack.push(System.currentTimeMillis());
     }
 
     public static void exitPhase() {
-        if (!ModConfig.diagnosticsEnabled || reloadStartTime == 0 || phaseStack.isEmpty()) return;
+        if (!ModConfig.isDiagnosticsEnabled() || reloadStartTime == 0 || phaseStack.isEmpty()) return;
         String name = phaseStack.pop();
         long start = phaseStartStack.pop();
         phaseRecords.add(new PhaseRecord(name, System.currentTimeMillis() - start));
