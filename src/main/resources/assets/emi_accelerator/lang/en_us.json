@@ -1,0 +1,33 @@
+{
+  "emi_accelerator.command.status": "Show EMI Accelerator cache status",
+  "emi_accelerator.command.clear": "Clear EMI Accelerator cache",
+  "emi_accelerator.command.reload": "Trigger EMI reload",
+
+  "emi_accelerator.status.title": "§a[EMI Accel] §7Status:",
+  "emi_accelerator.status.accel": "  §7Acceleration: ",
+  "emi_accelerator.status.file_size": "  §7File Size: §f%s",
+  "emi_accelerator.status.none": "None",
+  "emi_accelerator.status.cache_hit_prefix": "  §7Cache Hit: ",
+  "emi_accelerator.status.yes": "§aYes",
+  "emi_accelerator.status.no": "§cNo",
+  "emi_accelerator.status.load_time": "  §7Load Time: §f%dms",
+  "emi_accelerator.status.deferred_prefix": "  §7Deferred Search: ",
+  "emi_accelerator.status.on": "§aOn",
+  "emi_accelerator.status.off": "§cOff",
+  "emi_accelerator.status.building": " §e(building…)",
+
+  "emi_accelerator.cache.cleared": "§a[EMI Accel] §7Cache cleared, will regenerate on next reload",
+  "emi_accelerator.cache.cleared_reload": "§a[EMI Accel] §7Cache cleared",
+
+  "emi_accelerator.reload.triggered": "§a[EMI Accel] §7Reloading...",
+  "emi_accelerator.reload.complete_cached": "§a[EMI Accel] §7Reload complete §a(cached: %dms)",
+  "emi_accelerator.reload.complete_uncached": "§a[EMI Accel] §7Reload complete §e(uncached, %dms)",
+  "emi_accelerator.reload.building_suffix": " §7(search building in background…)",
+  "emi_accelerator.reload.full_force": "§a[EMI Accel] §7Full force reload with deferred search...",
+
+  "emi_accelerator.search.ready": "§a[EMI Accel] §7Search ready",
+
+  "emi_accelerator.toggle.chat": "§a[EMI Accel] §7Chat messages: %s",
+  "emi_accelerator.toggle.debug": "§a[EMI Accel] §7Debug mode: %s",
+  "emi_accelerator.toggle.accel": "§a[EMI Accel] §7Acceleration: %s"
+}
