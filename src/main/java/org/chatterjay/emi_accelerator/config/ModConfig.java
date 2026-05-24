@@ -1,90 +1,116 @@
 package org.chatterjay.emi_accelerator.config;
 
-import net.minecraftforge.fml.loading.FMLPaths;
+import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Properties;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ModConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger("ModConfig");
-    private static final Path CONFIG_DIR = FMLPaths.getOrCreateGameRelativePath(FMLPaths.CONFIGDIR.get().resolve("emi-accelerator"));
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Path CONFIG_DIR = Path.of("config", "emi-accelerator");
     private static final Path CONFIG_FILE = CONFIG_DIR.resolve("emi-accelerator.txt");
 
-    private static boolean cacheEnabled = true;
-    private static boolean autoClearOnModChange = true;
-    private static int maxFileSizeMb = 50;
-    private static boolean diagnosticsEnabled = true;
-    private static boolean deferredSearchEnabled = true;
+    private static final Map<String, String> DEFAULTS = new LinkedHashMap<>();
+    static {
+        DEFAULTS.put("acceleration.enabled", "true");
+        DEFAULTS.put("cache.enabled", "true");
+        DEFAULTS.put("cache.auto_clear_on_mod_change", "true");
+        DEFAULTS.put("cache.max_file_size_mb", "50");
+        DEFAULTS.put("diagnostics.enabled", "true");
+        DEFAULTS.put("search.deferred", "true");
+        DEFAULTS.put("chat.hide_messages", "false");
+        DEFAULTS.put("debug.enabled", "false");
+    }
+
+    private static final Map<String, String> VALUES = new ConcurrentHashMap<>(DEFAULTS);
+
+    public static boolean isAccelerationEnabled() {
+        return isTrue("acceleration.enabled");
+    }
+    public static boolean isCacheEnabled() {
+        return isTrue("cache.enabled");
+    }
+    public static boolean isAutoClearOnModChange() {
+        return isTrue("cache.auto_clear_on_mod_change");
+    }
+    public static int getMaxFileSizeMb() {
+        return getInt("cache.max_file_size_mb", 50);
+    }
+    public static boolean isDiagnosticsEnabled() {
+        return isTrue("diagnostics.enabled");
+    }
+    public static boolean isDeferredSearchEnabled() {
+        return isTrue("search.deferred");
+    }
+    public static boolean isChatMessagesHidden() {
+        return isTrue("chat.hide_messages");
+    }
+    public static boolean isDebugEnabled() {
+        return isTrue("debug.enabled");
+    }
+
+    public static void setChatMessagesHidden(boolean v) { VALUES.put("chat.hide_messages", String.valueOf(v)); save(); }
+    public static void setDebugEnabled(boolean v) { VALUES.put("debug.enabled", String.valueOf(v)); save(); }
+    public static void setAccelerationEnabled(boolean v) { VALUES.put("acceleration.enabled", String.valueOf(v)); save(); }
 
     public static void init() {
         try {
             Files.createDirectories(CONFIG_DIR);
-        } catch (IOException e) {
-            LOGGER.error("Could not create config directory", e);
-        }
-
-        if (Files.exists(CONFIG_FILE)) {
-            load();
-        } else {
-            save();
+            if (Files.exists(CONFIG_FILE)) {
+                load();
+            } else {
+                save();
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to init config from {}", CONFIG_FILE.toAbsolutePath(), e);
         }
     }
 
-    private static void load() {
-        Properties props = new Properties();
-        try (InputStream in = Files.newInputStream(CONFIG_FILE)) {
-            props.load(in);
-            cacheEnabled = Boolean.parseBoolean(props.getProperty("cacheEnabled", "true"));
-            autoClearOnModChange = Boolean.parseBoolean(props.getProperty("autoClearOnModChange", "true"));
-            maxFileSizeMb = Integer.parseInt(props.getProperty("maxFileSizeMb", "50"));
-            diagnosticsEnabled = Boolean.parseBoolean(props.getProperty("diagnosticsEnabled", "true"));
-            deferredSearchEnabled = Boolean.parseBoolean(props.getProperty("deferredSearchEnabled", "true"));
-        } catch (Exception e) {
-            LOGGER.error("Failed to load config, using defaults", e);
+    private static void load() throws IOException {
+        try (BufferedReader r = Files.newBufferedReader(CONFIG_FILE)) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                int eq = line.indexOf('=');
+                if (eq < 0) continue;
+                String key = line.substring(0, eq).trim();
+                String val = line.substring(eq + 1).trim();
+                if (DEFAULTS.containsKey(key)) {
+                    VALUES.put(key, val);
+                }
+            }
         }
     }
 
     public static void save() {
-        Properties props = new Properties();
-        props.setProperty("cacheEnabled", String.valueOf(cacheEnabled));
-        props.setProperty("autoClearOnModChange", String.valueOf(autoClearOnModChange));
-        props.setProperty("maxFileSizeMb", String.valueOf(maxFileSizeMb));
-        props.setProperty("diagnosticsEnabled", String.valueOf(diagnosticsEnabled));
-        props.setProperty("deferredSearchEnabled", String.valueOf(deferredSearchEnabled));
-        try (OutputStream out = Files.newOutputStream(CONFIG_FILE)) {
-            props.store(out, "EMI Accelerator Config");
-        } catch (Exception e) {
-            LOGGER.error("Failed to save config", e);
+        try (BufferedWriter w = Files.newBufferedWriter(CONFIG_FILE)) {
+            for (var entry : DEFAULTS.entrySet()) {
+                String val = VALUES.getOrDefault(entry.getKey(), entry.getValue());
+                w.write(entry.getKey() + "=" + val);
+                w.newLine();
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to save config to {}", CONFIG_FILE.toAbsolutePath(), e);
         }
+    }
+
+    private static boolean isTrue(String key) {
+        return "true".equals(VALUES.get(key));
+    }
+
+    private static int getInt(String key, int def) {
+        String v = VALUES.get(key);
+        if (v == null) return def;
+        try { return Integer.parseInt(v); } catch (NumberFormatException e) { return def; }
     }
 
     public static Path getConfigDir() {
         return CONFIG_DIR;
-    }
-
-    public static boolean isCacheEnabled() {
-        return cacheEnabled;
-    }
-
-    public static boolean isAutoClearOnModChange() {
-        return autoClearOnModChange;
-    }
-
-    public static int getMaxFileSizeMb() {
-        return maxFileSizeMb;
-    }
-
-    public static boolean isDiagnosticsEnabled() {
-        return diagnosticsEnabled;
-    }
-
-    public static boolean isDeferredSearchEnabled() {
-        return deferredSearchEnabled;
     }
 }

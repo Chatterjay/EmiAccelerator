@@ -1,55 +1,39 @@
 package org.chatterjay.emi_accelerator.util;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.mojang.logging.LogUtils;
+import org.chatterjay.emi_accelerator.config.ModConfig;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReloadTimer {
-    private static final Logger LOGGER = LoggerFactory.getLogger("ReloadTimer");
-    private static final Map<String, Long> timings = new LinkedHashMap<>();
-    private static long startTime = 0;
-    private static boolean cacheHit = false;
+    private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static void start() {
-        timings.clear();
-        cacheHit = false;
-        startTime = System.currentTimeMillis();
+    private static long reloadStartTime;
+    private static long lastReloadDuration;
+
+    public static void startReload() {
+        if (!ModConfig.isDiagnosticsEnabled()) return;
+        reloadStartTime = System.currentTimeMillis();
     }
 
     public static void checkpoint(String name) {
-        long now = System.currentTimeMillis();
-        timings.put(name, now - startTime);
+        if (!ModConfig.isDiagnosticsEnabled() || reloadStartTime == 0) return;
     }
 
-    public static void markCacheHit() {
-        cacheHit = true;
+    public static void finishReload(boolean cacheHit) {
+        if (!ModConfig.isDiagnosticsEnabled() || reloadStartTime == 0) return;
+        lastReloadDuration = System.currentTimeMillis() - reloadStartTime;
+        LOGGER.debug("EMI reload completed in {}ms{}", lastReloadDuration, cacheHit ? " (cache hit)" : "");
     }
 
-    public static long finish() {
-        long total = System.currentTimeMillis() - startTime;
-        LOGGER.debug("EMI reload completed in {}ms{}", total, cacheHit ? " (cache hit)" : "");
-
-        Path timingsFile = org.chatterjay.emi_accelerator.config.ModConfig.getConfigDir().resolve("reload-timings.json");
-        try {
-            Files.createDirectories(timingsFile.getParent());
-            JsonObject root = new JsonObject();
-            root.addProperty("total_ms", total);
-            root.addProperty("cache_hit", cacheHit);
-            var timingsObj = new JsonObject();
-            timings.forEach((name, ms) -> timingsObj.addProperty(name, ms));
-            root.add("checkpoints", timingsObj);
-            Files.writeString(timingsFile, new GsonBuilder().setPrettyPrinting().create().toJson(root));
-        } catch (IOException e) {
-            // ignore
-        }
-
-        return total;
+    public static long getLastReloadDuration() {
+        return lastReloadDuration;
     }
 }

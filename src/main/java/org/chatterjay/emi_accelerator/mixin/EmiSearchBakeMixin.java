@@ -1,6 +1,7 @@
 package org.chatterjay.emi_accelerator.mixin;
 
 import dev.emi.emi.search.EmiSearch;
+import org.chatterjay.emi_accelerator.config.ModConfig;
 import org.chatterjay.emi_accelerator.util.EmiSearchDeferrer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,7 +13,8 @@ public class EmiSearchBakeMixin {
 
     @Inject(method = "bake", at = @At("HEAD"), cancellable = true)
     private static void onBake(CallbackInfo ci) {
-        if (EmiSearchDeferrer.isPending()) {
+        if (!ModConfig.isAccelerationEnabled()) return;
+        if (ModConfig.isDeferredSearchEnabled() && EmiSearchDeferrer.consumePending()) {
             EmiSearchDeferrer.doDefer();
             ci.cancel();
         }

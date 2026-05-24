@@ -7,6 +7,9 @@
     "EmiStackListMixin",
     "EmiReloadManagerMixin",
     "EmiReloadWorkerMixin",
+    "EmiReloadLogMixin",
+    "EmiScreenManagerMixin",
+    "EmiSearchMixin",
     "EmiPlayerInventoryMixin",
     "EmiSearchBakeMixin"
   ],
